@@ -1,53 +1,73 @@
 import { useState } from "react";
-import { askQuestion } from "../services/api";
+import axios from "axios";
 
-function ChatBox() {
+export default function ChatBox() {
   const [question, setQuestion] = useState("");
-  const [answer, setAnswer] = useState("");
+  const [messages, setMessages] = useState([]);
 
-  const handleAsk = async () => {
+  const askQuestion = async () => {
+    if (!question) return;
+
+    const userMessage = {
+      role: "user",
+      text: question,
+    };
+
+    setMessages((prev) => [...prev, userMessage]);
+
     try {
-      const response = await askQuestion(question);
-
-      console.log(response.data);
-
-      setAnswer(
-        response.data.answer ||
-        response.data.error ||
-        "No response received"
+      const response = await axios.post(
+        "http://localhost:8000/chat",
+        {
+          question,
+        }
       );
-    } catch (error) {
-      console.error(error);
 
-      setAnswer(
-        error.response?.data?.error ||
-        error.message
-      );
+      const aiMessage = {
+        role: "ai",
+        text: response.data.answer,
+      };
+
+      setMessages((prev) => [...prev, aiMessage]);
+    } catch {
+      alert("Error");
     }
+
+    setQuestion("");
   };
 
   return (
-    <div>
-      <h2>Ask Question</h2>
+    <div className="card">
+      <h2>Chat</h2>
 
-      <input
-        type="text"
-        value={question}
-        onChange={(e) =>
-          setQuestion(e.target.value)
-        }
-        placeholder="Ask something..."
-      />
+      <div className="chat-window">
+        {messages.map((msg, index) => (
+          <div
+            key={index}
+            className={
+              msg.role === "user"
+                ? "user-msg"
+                : "ai-msg"
+            }
+          >
+            {msg.text}
+          </div>
+        ))}
+      </div>
 
-      <button onClick={handleAsk}>
-        Ask
-      </button>
+      <div className="chat-input">
+        <input
+          value={question}
+          onChange={(e) =>
+            setQuestion(e.target.value)
+          }
+          placeholder="Ask anything..."
+        />
 
-      <h3>Answer:</h3>
-
-      <p>{answer}</p>
+        <button onClick={askQuestion}>
+          Send
+        </button>
+      </div>
     </div>
   );
 }
-
-export default ChatBox;

@@ -1,25 +1,34 @@
 import UploadPDF from "../components/UploadPDF";
-
 import ChatBox from "../components/ChatBox";
 
-function Home() {
+export default function Home() {
+  return (
+    <div className="app">
+      <aside className="sidebar">
+        <h2>📄 PDF Assistant</h2>
 
-    return (
+        <div className="sidebar-card">
+          <h3>Features</h3>
 
-        <div>
-
-            <h1>
-                AI PDF Chatbot
-            </h1>
-
-            <UploadPDF />
-
-            <hr />
-
-            <ChatBox />
-
+          <ul>
+            <li>Ask Questions</li>
+            <li>Summarize PDF</li>
+            <li>Extract Key Points</li>
+            <li>AI Chat</li>
+          </ul>
         </div>
-    );
-}
+      </aside>
 
-export default Home;
+      <main className="content">
+        <header className="header">
+          <h1>AI PDF Chatbot</h1>
+          <p>Chat with your PDFs using AI</p>
+        </header>
+
+        <UploadPDF />
+
+        <ChatBox />
+      </main>
+    </div>
+  );
+}

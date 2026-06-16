@@ -1,41 +1,48 @@
-import { uploadPDF } from "../services/api";
+import { useState } from "react";
+import axios from "axios";
 
-function UploadPDF() {
+export default function UploadPDF() {
+  const [file, setFile] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-    const handleUpload = async (event) => {
+  const uploadFile = async () => {
+    if (!file) return;
 
-        const file = event.target.files[0];
+    const formData = new FormData();
+    formData.append("file", file);
 
-        if (!file) return;
+    try {
+      setLoading(true);
 
-        try {
+      await axios.post(
+        "http://localhost:8000/upload",
+        formData
+      );
 
-            await uploadPDF(file);
+      alert("PDF uploaded successfully");
+    } catch (err) {
+      alert("Upload failed");
+    }
 
-            alert("PDF Uploaded Successfully");
+    setLoading(false);
+  };
 
-        } catch (error) {
+  return (
+    <div className="card">
+      <h2>Upload PDF</h2>
 
-            console.error(error);
+      <input
+        type="file"
+        accept=".pdf"
+        onChange={(e) => setFile(e.target.files[0])}
+      />
 
-            alert("Upload Failed");
-        }
-    };
-
-    return (
-
-        <div>
-
-            <h2>Upload PDF</h2>
-
-            <input
-                type="file"
-                accept=".pdf"
-                onChange={handleUpload}
-            />
-
-        </div>
-    );
+      <button
+        onClick={uploadFile}
+        disabled={loading}
+      >
+        {loading ? "Uploading..." : "Upload"}
+      </button>
+    </div>
+  );
 }
-
-export default UploadPDF;
